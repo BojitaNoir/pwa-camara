@@ -4,6 +4,11 @@ const video = document.getElementById('video');
 const takePhotoBtn = document.getElementById('takePhoto');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+const galleryElement = document.getElementById('gallery');
+const clearGalleryBtn = document.getElementById('clearGallery');
+
+// Array para almacenar las fotos (se guardará en localStorage)
+let photos = [];
 
 let stream = null;
 let currentFacing = 'environment'; // 'environment' (trasera) o 'user' (frontal)
@@ -87,23 +92,107 @@ async function openCamera() {
     await startCamera(currentFacing);
 }
 
+// Cargar fotos guardadas al iniciar
+function loadSavedPhotos() {
+    const savedPhotos = localStorage.getItem('pwa-camera-photos');
+    if (savedPhotos) {
+        photos = JSON.parse(savedPhotos);
+        renderGallery();
+    }
+}
+
+// Guardar fotos en localStorage
+function savePhotos() {
+    localStorage.setItem('pwa-camera-photos', JSON.stringify(photos));
+    renderGallery();
+}
+
+// Renderizar galería de fotos
+function renderGallery() {
+    if (!galleryElement) return;
+    
+    galleryElement.innerHTML = '';
+
+    if (photos.length === 0) {
+        const emptyMessage = document.createElement('div');
+        emptyMessage.className = 'gallery-empty-message';
+        emptyMessage.innerHTML = `
+            <span style="font-size: 2rem;">📸</span>
+            <p style="margin: 0.5rem 0;">Toma algunas fotos y aparecerán aquí</p>
+            <small style="opacity: 0.7;">Las fotos se guardarán automáticamente</small>
+        `;
+        galleryElement.appendChild(emptyMessage);
+        return;
+    }
+    
+    photos.forEach((photo, index) => {
+        const item = document.createElement('div');
+        item.className = 'gallery-item';
+        
+        const img = document.createElement('img');
+        img.src = photo;
+        img.alt = `Foto ${index + 1}`;
+        
+        const downloadBtn = document.createElement('div');
+        downloadBtn.className = 'download-btn';
+        downloadBtn.innerHTML = '⬇️';
+        downloadBtn.onclick = () => downloadPhoto(photo, index);
+        
+        item.appendChild(img);
+        item.appendChild(downloadBtn);
+        galleryElement.appendChild(item);
+    });
+    
+    // Mostrar/ocultar botón de limpiar
+    if (clearGalleryBtn) {
+        clearGalleryBtn.style.display = photos.length > 0 ? 'inline-flex' : 'none';
+    }
+}
+
+// Descargar foto
+function downloadPhoto(dataUrl, index) {
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = `foto-${index + 1}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 function takePhoto() {
     if (!stream) {
         alert('Primero debes abrir la cámara');
         return;
     }
 
+    // Capturar la foto
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
     const imageDataURL = canvas.toDataURL('image/png');
     
-    console.log('📸 Foto capturada en base64:');
-    console.log(imageDataURL);
-    console.log(`Tamaño de la imagen: ${imageDataURL.length} caracteres`);
+    // Guardar la foto en el array y localStorage
+    photos.push(imageDataURL);
+    savePhotos();
     
-    alert('¡Foto capturada! Revisa la consola para ver el base64');
-    
-    closeCamera();
+    // Crear y mostrar la notificación
+    const notification = document.createElement('div');
+    notification.textContent = '¡Foto guardada! 📸';
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--primary-color);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 25px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 1000;
+    `;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 2000);
+
+    // No cerrar la cámara después de tomar la foto
+    // closeCamera(); - Removemos esta línea para mantener la cámara abierta
 }
 
 function closeCamera() {
@@ -140,8 +229,59 @@ if (toggleCameraBtn) {
     });
 }
 
+// Limpiar galería
+if (clearGalleryBtn) {
+    clearGalleryBtn.addEventListener('click', () => {
+        if (confirm('¿Estás seguro de que quieres eliminar todas las fotos?')) {
+            photos = [];
+            savePhotos();
+        }
+    });
+}
+
 window.addEventListener('beforeunload', () => {
     closeCamera();
 });
+
+// Navegación de la galería
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+if (prevBtn && nextBtn && galleryElement) {
+    prevBtn.addEventListener('click', () => {
+        galleryElement.scrollBy({
+            left: -300,
+            behavior: 'smooth'
+        });
+    });
+
+    nextBtn.addEventListener('click', () => {
+        galleryElement.scrollBy({
+            left: 300,
+            behavior: 'smooth'
+        });
+    });
+
+    // Mostrar/ocultar botones según la posición del scroll
+    galleryElement.addEventListener('scroll', () => {
+        const showPrev = galleryElement.scrollLeft > 0;
+        const showNext = galleryElement.scrollLeft < (galleryElement.scrollWidth - galleryElement.clientWidth);
+        
+        prevBtn.style.display = showPrev ? 'flex' : 'none';
+        nextBtn.style.display = showNext ? 'flex' : 'none';
+    });
+}
+
+// También podemos usar las teclas de flecha para navegar
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') {
+        prevBtn?.click();
+    } else if (e.key === 'ArrowRight') {
+        nextBtn?.click();
+    }
+});
+
+// Cargar fotos guardadas al iniciar
+loadSavedPhotos();
 
 console.log('📱 PWA Cámara cargada. Presiona F12 para abrir las herramientas de desarrollador y ver la consola.');

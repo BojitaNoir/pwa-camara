@@ -107,6 +107,212 @@
             box-shadow: 0 8px 16px rgba(0,0,0,0.1);
         }
 
+        .gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            min-height: 200px;
+        }
+
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(108,92,231,0.2);
+        }
+
+        .gallery-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .gallery-grid {
+            display: flex;
+            gap: 1.2rem;
+            padding: 1rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(108,92,231,0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1.5rem;
+            scrollbar-width: none; /* Para Firefox */
+            -ms-overflow-style: none; /* Para Internet Explorer y Edge */
+        }
+
+        .gallery-grid::-webkit-scrollbar {
+            height: 12px;
+        }
+
+        .gallery-grid::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 6px;
+            margin: 0 10px;
+        }
+
+        .gallery-grid::-webkit-scrollbar-thumb {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border-radius: 6px;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .gallery-grid::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to right, var(--secondary-color), var(--accent-color));
+        }
+
+        /* Flechas de navegación */
+        .gallery-nav {
+            display: none;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.9);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 3;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-container {
+            position: relative;
+            padding: 0 20px;
+        }
+
+        .gallery-container:hover .gallery-nav {
+            display: flex;
+        }
+
+        .gallery-nav:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .gallery-nav.prev {
+            left: 10px;
+        }
+
+        .gallery-nav.next {
+            right: 10px;
+        }
+
+        .gallery-item {
+            position: relative;
+            width: 280px;
+            flex: 0 0 auto;
+            aspect-ratio: 1;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            transform-origin: center;
+            cursor: pointer;
+            scroll-snap-align: start;
+        }
+
+        .gallery-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0,0,0,0.5)
+            );
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 8px 25px rgba(108,92,231,0.2);
+        }
+
+        .gallery-item:hover::before {
+            opacity: 1;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .gallery-item .download-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.95);
+            color: var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 2;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .gallery-item:hover .download-btn {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .gallery-item .download-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108,92,231,0.3);
+        }
+
+        .gallery-empty-message {
+            text-align: center;
+            color: #666;
+            padding: 3rem 2rem;
+            font-style: italic;
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px dashed rgba(108,92,231,0.2);
+        }
+
         .button-group {
             display: flex;
             gap: 1rem;
@@ -166,6 +372,20 @@
     </div>
     
     <canvas id="canvas" width="320" height="240"></canvas>
+
+    <div class="gallery">
+        <div class="gallery-header">
+            <h2>📸 Fotos Capturadas</h2>
+            <button id="clearGallery" style="display: none;">
+                <span>🗑️</span> Limpiar
+            </button>
+        </div>
+        <div class="gallery-container">
+            <button class="gallery-nav prev" id="prevBtn">◀</button>
+            <div class="gallery-grid" id="gallery"></div>
+            <button class="gallery-nav next" id="nextBtn">▶</button>
+        </div>
+    </div>
     
     <script src="app.js"></script>
     <script>

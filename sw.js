@@ -1,11 +1,11 @@
-const CACHE_NAME = 'camara-pwa-v2';
+const CACHE_NAME = 'camara-pwa-v1';
 const urlsToCache = [
-    './',
-    './index.html',
-    './app.js',
-    './manifest.json',
-    './img/192.png',
-    './img/512.png'
+    'https://bojitanoir.github.io/pwa-camara/',
+    'https://bojitanoir.github.io/pwa-camara/index.html',
+    'https://bojitanoir.github.io/pwa-camara/app.js',
+    'https://bojitanoir.github.io/pwa-camara/manifest.json',
+    'https://bojitanoir.github.io/pwa-camara/img/192.png',
+    'https://bojitanoir.github.io/pwa-camara/img/512.png'
 ];
 
 self.addEventListener('install', function(event) {

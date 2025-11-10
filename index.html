@@ -362,6 +362,77 @@
         .then(reg => console.log("SW registrado:", reg))
         .catch(err => console.error("Error SW:", err));
     }
+
+    // === BOTÓN DE INSTALACIÓN (ajustado para quedar dentro del contenedor) ===
+let deferredPrompt;
+
+// Crear el botón de instalación
+const installButton = document.createElement("button");
+installButton.textContent = "⬇️ Instalar aplicación";
+installButton.id = "installAppButton";
+installButton.style.display = "none";
+
+// Buscar un contenedor adecuado (debajo de la galería)
+const mainContainer = document.querySelector("main");
+mainContainer.appendChild(installButton);
+
+// Estilo visual del botón (moderno y adaptable)
+const style = document.createElement("style");
+style.textContent = `
+  #installAppButton {
+    background: linear-gradient(45deg, #1a2a6c, #b21f1f);
+    color: white;
+    padding: 14px 26px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 30px auto 0;
+    display: block;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+
+  #installAppButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  }
+
+  @media (max-width: 480px) {
+    #installAppButton {
+      width: 100%;
+      font-size: 1rem;
+      padding: 12px;
+    }
+  }
+`;
+document.head.appendChild(style);
+
+// Escuchar el evento antes de la instalación
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installButton.style.display = "block"; // Mostrar el botón
+
+  installButton.addEventListener("click", async () => {
+    installButton.disabled = true;
+    deferredPrompt.prompt();
+
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`Respuesta del usuario: ${outcome}`);
+
+    deferredPrompt = null;
+    installButton.style.display = "none";
+  });
+});
+
+// Cuando se instala la PWA
+window.addEventListener("appinstalled", () => {
+  console.log("✅ Aplicación instalada correctamente");
+  installButton.remove();
+});
   </script>
 </body>
 </html>

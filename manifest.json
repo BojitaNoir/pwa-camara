@@ -1,25 +1,25 @@
 {
-    "name": "PWA Cámara - Isai",
-    "short_name": "CamaraPWA",
-    "description": "Aplicación web progresiva para tomar fotos con la cámara del dispositivo y gestionar galería",
-    "start_url": "https://bojitanoir.github.io/pwa-camara/",
-    "scope": "https://bojitanoir.github.io/pwa-camara/",
-    "display": "standalone",
-    "background_color": "#1a2a6c",
-    "theme_color": "#1a2a6c",
-    "orientation": "portrait",
-    "icons": [
-        {
-            "src": "https://bojitanoir.github.io/pwa-camara/img/192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any maskable"
-        },
-        {
-            "src": "https://bojitanoir.github.io/pwa-camara/img/512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any maskable"
-        }
-    ]
+  "name": "PWA Cámara - Isai",
+  "short_name": "CamaraPWA",
+  "description": "Aplicación web progresiva para tomar fotos con la cámara del dispositivo y gestionar galería",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1a2a6c",
+  "theme_color": "#1a2a6c",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./img/192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./img/512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }

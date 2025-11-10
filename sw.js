@@ -1,45 +1,74 @@
 const CACHE_NAME = 'camara-pwa-v1';
 const urlsToCache = [
-    'https://bojitanoir.github.io/pwa-camara/',
-    'https://bojitanoir.github.io/pwa-camara/index.html',
-    'https://bojitanoir.github.io/pwa-camara/app.js',
-    'https://bojitanoir.github.io/pwa-camara/manifest.json',
-    'https://bojitanoir.github.io/pwa-camara/img/192.png',
-    'https://bojitanoir.github.io/pwa-camara/img/512.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './app.js',
+  './img/192.png',
+  './img/512.png'
 ];
 
-self.addEventListener('install', function(event) {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(function(cache) {
-                console.log('Cache abierto');
-                return cache.addAll(urlsToCache);
-            })
-    );
+// === INSTALACIÓN ===
+self.addEventListener('install', event => {
+  console.log('[Service Worker] Instalando...');
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => {
+      console.log('[Service Worker] Cache abierto');
+      return cache.addAll(urlsToCache);
+    })
+  );
+  self.skipWaiting(); // Activa inmediatamente el SW nuevo
 });
 
-self.addEventListener('fetch', function(event) {
-    event.respondWith(
-        caches.match(event.request)
-            .then(function(response) {
-                if (response) {
-                    return response;
-                }
-                return fetch(event.request);
-            })
-    );
-});
-
-self.addEventListener('activate', function(event) {
-    event.waitUntil(
-        caches.keys().then(function(cacheNames) {
-            return Promise.all(
-                cacheNames.map(function(cacheName) {
-                    if (cacheName !== CACHE_NAME) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
+// === ACTIVACIÓN ===
+self.addEventListener('activate', event => {
+  console.log('[Service Worker] Activando...');
+  event.waitUntil(
+    caches.keys().then(keys => {
+      return Promise.all(
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            console.log('[Service Worker] Eliminando cache antiguo:', key);
+            return caches.delete(key);
+          }
         })
-    );
+      );
+    })
+  );
+  self.clients.claim(); // Controla las páginas sin recarga
+});
+
+// === INTERCEPTAR PETICIONES ===
+self.addEventListener('fetch', event => {
+  // Solo maneja peticiones GET
+  if (event.request.method !== 'GET') return;
+
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      if (response) {
+        // Si está en cache, úsalo
+        return response;
+      }
+      // Si no está, lo descarga y guarda en cache dinámico
+      return fetch(event.request)
+        .then(networkResponse => {
+          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+            return networkResponse;
+          }
+
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseToCache);
+          });
+
+          return networkResponse;
+        })
+        .catch(() => {
+          // Si falla la red, intenta una página de fallback
+          if (event.request.destination === 'document') {
+            return caches.match('./index.html');
+          }
+        });
+    })
+  );
 });
